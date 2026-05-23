@@ -369,6 +369,15 @@
             let nextSlide = (currentSlide + 1) % slides.length;
             showSlide(nextSlide);
         }, 5000);
+        // 汉堡菜单交互
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        }
     </script>
 </body>
 </html>
