@@ -18,7 +18,6 @@
             background-color: #fff;
         }
 
-        /* 主题色变量 */
         :root {
             --theme-color: #1e50ae;
             --secondary-color: #3F23B4;
@@ -28,7 +27,7 @@
             --footer-text: #7b7b7b;
         }
 
-        /* 导航栏 */
+        /* 导航栏 - 电脑端默认样式 */
         .header {
             position: fixed;
             top: 0;
@@ -82,6 +81,16 @@
         .nav-links a:hover,
         .nav-links a.active {
             color: var(--theme-color);
+        }
+
+        /* 汉堡按钮 - 电脑端默认隐藏 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
         }
 
         /* 轮播图 */
@@ -208,70 +217,48 @@
             text-align: center;
             font-size: 12px;
         }
-        .menu-toggle {
-            display: none; /* 默认隐藏汉堡按钮 */
-        }
 
-        /* 移动端适配 */
+        /* ====================================== */
+        /* 移动端适配（仅手机生效） */
+        /* ====================================== */
         @media (max-width: 768px) {
-    .nav-container {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 10px 20px;
-    }
+            .nav-container {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px 20px;
+            }
 
-    .nav-links {
-        display: none; /* 默认隐藏，点击按钮后显示 */
-        flex-direction: column;
-        width: 100%;
-        text-align: center;
-    }
+            /* 手机端导航默认隐藏 */
+            #navLinks {
+                display: none !important;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
+            }
 
-    .nav-links.active {
-        display: flex; /* 点击按钮后显示 */
-    }
+            .nav-links li {
+                margin: 10px 0;
+            }
 
-    .nav-links li {
-        margin: 10px 0;
-    }
+            /* 手机端显示汉堡按钮 */
+            .menu-toggle {
+                display: block !important;
+            }
 
-    /* 汉堡菜单按钮样式 */
-    .menu-toggle {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #333;
-    }
+            .banner {
+                margin-top: 60px;
+                height: 60vw;
+            }
 
-    .menu-toggle:focus {
-        outline: none;
-    }
+            .main-content {
+                padding: 40px 20px;
+            }
 
-    .banner {
-        margin-top: 0; /* 取消顶部间距，紧贴导航栏 */
-        height: 60vw;
-    }
-
-    .main-content {
-        padding: 40px 20px;
-    }
-
-    .main-logo {
-        width: 150px;
-    }
-
-    .intro-text {
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .intro-text-en {
-        font-size: 11px;
-        line-height: 1.5;
-    }
-}
+            .main-logo {
+                width: 150px;
+            }
+        }
     </style>
     <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -281,6 +268,7 @@
     <link rel="manifest" href="/images/site.webmanifest" />
 </head>
 <body>
+
     <!-- 导航栏 -->
     <header class="header">
         <div class="nav-container">
@@ -288,8 +276,9 @@
                 <img src="./images/logo.png" alt="ISA Spectrum Logo">
                 <span>ISA Spectrum</span>
             </a>
+            <!-- 汉堡按钮 -->
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <!-- ✅ 修复：加了 id="navLinks" -->
+            <!-- 导航菜单（固定ID） -->
             <ul class="nav-links" id="navLinks">
                 <li><a href="main.html" class="active">首页</a></li>
                 <li><a href="notice.html">公告</a></li>
@@ -306,7 +295,7 @@
         <div class="banner-slide" style="background-image: url('./images/2.jpg')"></div>
         <div class="banner-dots">
             <span class="banner-dot active" data-index="0"></span>
-            <span class="banner-dot" data-index="1"></span>
+            <span class="banner-dot active" data-index="1"></span>
         </div>
     </section>
 
@@ -340,39 +329,36 @@
         </div>
     </footer>
 
-    <!-- 轮播图脚本 -->
     <script>
-        // 简单的轮播图功能
+        // 轮播图
         const slides = document.querySelectorAll('.banner-slide');
         const dots = document.querySelectorAll('.banner-dot');
         let currentSlide = 0;
 
         function showSlide(index) {
-            // 隐藏所有幻灯片
-            slides.forEach(slide => slide.classList.remove('active'));
-            // 移除所有点的激活状态
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            // 显示当前幻灯片
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
             slides[index].classList.add('active');
-            // 激活当前点
             dots[index].classList.add('active');
-            
             currentSlide = index;
         }
 
-        // 点击圆点切换幻灯片
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                showSlide(index);
-            });
-        });
+        dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
+        setInterval(() => showSlide((currentSlide + 1) % slides.length), 5000);
 
-        // 自动轮播
-        setInterval(() => {
-            let nextSlide = (currentSlide + 1) % slides.length;
-            showSlide(nextSlide);
-        }, 5000);
+        // ======================================
+        // 汉堡菜单 - 终极修复版
+        // ======================================
+        const menuBtn = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navLinks');
+        
+        menuBtn.onclick = function() {
+            if(navMenu.style.display === 'flex'){
+                navMenu.style.display = 'none';
+            }else{
+                navMenu.style.display = 'flex';
+            }
+        };
     </script>
 </body>
 </html>
