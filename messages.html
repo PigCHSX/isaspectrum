@@ -450,9 +450,9 @@
             </div>
             <!-- 多图上传按钮 -->
             <div class="form-group">
-                <label>上传图片（可选，最多5张）</label>
+                <label>上传图片（可选，电脑端支持多张，最多5张）</label>
                 <div class="file-upload" id="fileUploadContainer" onclick="document.getElementById('messagePicFile').click()">
-                    <span>点击选择多张图片（Mac按Command多选）</span>
+                    <span>点击选择多张图片（Mac按Command/Windows按Ctrl多选）</span>
                     <input type="file" id="messagePicFile" accept="image/*" multiple onchange="previewImages(this)">
                 </div>
                 <div class="preview-container" id="previewContainer"></div>
@@ -636,6 +636,15 @@
             const div = document.createElement('div');
             div.textContent = text || '';
             return div.innerHTML;
+        }
+        // 汉堡菜单交互
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
         }
     </script>
 </body>
