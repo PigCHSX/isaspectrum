@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISA Spectrum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "微软雅黑", sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        /* 主题色变量 */
+        :root {
+            --theme-color: #1e50ae;
+            --secondary-color: #3F23B4;
+            --text-gray: #999;
+            --text-light-gray: #ccc;
+            --footer-bg: #262626;
+            --footer-text: #7b7b7b;
+        }
+
+        /* 导航栏 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--theme-color);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--theme-color);
+        }
+
+        /* 轮播图 */
+        .banner {
+            margin-top: 60px;
+            width: 100%;
+            height: 56.25vw;
+            max-height: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .banner-slide.active {
+            opacity: 1;
+        }
+
+        .banner-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+        }
+
+        .banner-dot {
+            width: 40px;
+            height: 3px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .banner-dot.active {
+            background-color: #fff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .main-logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+
+        .intro-text {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 30px;
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .intro-text-en {
+            font-size: 12px;
+            color: var(--text-light-gray);
+            line-height: 26px;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .more-link {
+            color: var(--theme-color);
+            text-decoration: none;
+            font-size: 14px;
+            line-height: 30px;
+        }
+
+        .more-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 页脚 */
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 40px 20px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .footer-section h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p {
+            font-size: 13px;
+            line-height: 22px;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #2b2b2b;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .banner {
+                margin-top: 60px;
+                height: 60vw;
+            }
+
+            .main-content {
+                padding: 40px 20px;
+            }
+
+            .main-logo {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="./images/logo.png" alt="ISA Spectrum Logo">
+                <span>ISA Spectrum</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">首页</a></li>
+                <li><a href="notice.html">公告</a></li>
+                <li><a href="messages.html">校墙</a></li>
+                <li><a href="about.html">关于ISA Spectrum</a></li>
+                <li><a href="contact.html">联系我们</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- 轮播图 -->
+    <section class="banner">
+        <div class="banner-slide active" style="background-image: url('./images/1.jpg')"></div>
+        <div class="banner-slide" style="background-image: url('./images/2.jpg')"></div>
+        <div class="banner-dots">
+            <span class="banner-dot active" data-index="0"></span>
+            <span class="banner-dot" data-index="1"></span>
+        </div>
+    </section>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <img src="./images/logo.png" alt="ISA Spectrum Logo" class="main-logo">
+        <p class="intro-text">
+            团队专注于校园趣事的无纸展示和评论互动以及校墙留言板，为用户提供独特的阅读、投稿与留言体验。始于2026年5月20日，地址在武汉爱莎文华中学，联系邮箱为peiguo.li29@isawuhan.com（后期可能变动）。
+        </p>
+        <p class="intro-text-en">
+            The team focuses on the paperless display and interactive comments of campus anecdotes, as well as the school wall message board, providing users with a unique reading, submission, and commenting experience. Established on May 20, 2026, located at Aisha Wenhua Middle School in Wuhan, with a contact email of peiguo.li29@isawuhan.com (subject to change in the future).
+        </p>
+        <a href="about.html" class="more-link">MORE &gt;<br>——————</a>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>TEMPLATE</h3>
+            </div>
+            <div class="footer-section">
+                <p>联系邮箱<br>peiguo.li29@isawuhan.com（后期可能变动）</p>
+            </div>
+            <div class="footer-section">
+                <p>联系电话<br>16602707968</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>©2026 - ISA Spectrum 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- 轮播图脚本 -->
+    <script>
+        // 简单的轮播图功能
+        const slides = document.querySelectorAll('.banner-slide');
+        const dots = document.querySelectorAll('.banner-dot');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            // 隐藏所有幻灯片
+            slides.forEach(slide => slide.classList.remove('active'));
+            // 移除所有点的激活状态
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            // 显示当前幻灯片
+            slides[index].classList.add('active');
+            // 激活当前点
+            dots[index].classList.add('active');
+            
+            currentSlide = index;
+        }
+
+        // 点击圆点切换幻灯片
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+
+        // 自动轮播
+        setInterval(() => {
+            let nextSlide = (currentSlide + 1) % slides.length;
+            showSlide(nextSlide);
+        }, 5000);
+    </script>
+</body>
+</html>
