@@ -285,5 +285,16 @@
             <p>©2026 - ISA Spectrum 版权所有</p>
         </div>
     </footer>
+    <script>
+        // 汉堡菜单交互
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
 </body>
 </html>
