@@ -211,23 +211,64 @@
 
         /* 移动端适配 */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
+    .nav-container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 20px;
+    }
 
-            .banner {
-                margin-top: 60px;
-                height: 60vw;
-            }
+    .nav-links {
+        display: none; /* 默认隐藏，点击按钮后显示 */
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+    }
 
-            .main-content {
-                padding: 40px 20px;
-            }
+    .nav-links.active {
+        display: flex; /* 点击按钮后显示 */
+    }
 
-            .main-logo {
-                width: 150px;
-            }
-        }
+    .nav-links li {
+        margin: 10px 0;
+    }
+
+    /* 汉堡菜单按钮样式 */
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .menu-toggle:focus {
+        outline: none;
+    }
+
+    .banner {
+        margin-top: 0; /* 取消顶部间距，紧贴导航栏 */
+        height: 60vw;
+    }
+
+    .main-content {
+        padding: 40px 20px;
+    }
+
+    .main-logo {
+        width: 150px;
+    }
+
+    .intro-text {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .intro-text-en {
+        font-size: 11px;
+        line-height: 1.5;
+    }
+}
     </style>
     <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
