@@ -84,6 +84,16 @@
             color: var(--theme-color);
         }
 
+        /* 汉堡按钮 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
         .main-content {
             max-width: 1200px;
             margin: 60px auto;
@@ -350,10 +360,34 @@
             font-size: 12px;
         }
 
+        /* 移动端适配 + 汉堡菜单 */
         @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px 20px;
+            }
+
             .nav-links {
                 display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
             }
+
+            .nav-links.show {
+                display: flex !important;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+            }
+
+            .menu-toggle {
+                display: block !important;
+            }
+
             .page-title {
                 font-size: 24px;
             }
@@ -392,7 +426,9 @@
                 <img src="./images/logo.png" alt="ISA Spectrum Logo">
                 <span>ISA Spectrum</span>
             </a>
-            <ul class="nav-links">
+            <!-- 新增汉堡按钮 -->
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <ul class="nav-links" id="navList">
                 <li><a href="main.html">首页</a></li>
                 <li><a href="notice.html">公告</a></li>
                 <li><a href="messages.html" class="active">校墙</a></li>
@@ -604,6 +640,13 @@
             div.textContent = text || '';
             return div.innerHTML;
         }
+
+        // ✅ 汉堡菜单JS（终于加上了！）
+        const btn = document.getElementById('menuToggle');
+        const list = document.getElementById('navList');
+        btn.onclick = function(){
+            list.classList.toggle('show');
+        };
     </script>
 </body>
 </html>
