@@ -84,10 +84,20 @@
             color: var(--theme-color);
         }
 
+        /* 汉堡按钮 - 电脑端隐藏 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
         /* 公告区域样式 */
         .notice-container {
             max-width: 1200px;
-            margin: 3rem auto;
+            margin: 80px auto 3rem;
             padding: 0 5%;
         }
 
@@ -162,69 +172,35 @@
             text-align: center;
             font-size: 12px;
         }
-        .menu-toggle {
-            display: none; /* 默认隐藏汉堡按钮 */
-        }
+
         /* 移动端适配 */
         @media (max-width: 768px) {
-    .nav-container {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 10px 20px;
-    }
+            .nav-container {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px 20px;
+            }
 
-    .nav-links {
-        display: none; /* 默认隐藏，点击按钮后显示 */
-        flex-direction: column;
-        width: 100%;
-        text-align: center;
-    }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
+            }
 
-    .nav-links.active {
-        display: flex; /* 点击按钮后显示 */
-    }
+            .nav-links.show {
+                display: flex !important;
+            }
 
-    .nav-links li {
-        margin: 10px 0;
-    }
+            .nav-links li {
+                margin: 10px 0;
+            }
 
-    /* 汉堡菜单按钮样式 */
-    .menu-toggle {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #333;
-    }
-
-    .menu-toggle:focus {
-        outline: none;
-    }
-
-    .banner {
-        margin-top: 0; /* 取消顶部间距，紧贴导航栏 */
-        height: 60vw;
-    }
-
-    .main-content {
-        padding: 40px 20px;
-    }
-
-    .main-logo {
-        width: 150px;
-    }
-
-    .intro-text {
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .intro-text-en {
-        font-size: 11px;
-        line-height: 1.5;
-    }
-}
+            .menu-toggle {
+                display: block !important;
+            }
+        }
     </style>
     <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -242,7 +218,7 @@
                 <span>ISA Spectrum</span>
             </a>
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <ul class="nav-links">
+            <ul class="nav-links" id="navList">
                 <li><a href="main.html">首页</a></li>
                 <li><a href="notice.html" class="active">公告</a></li>
                 <li><a href="messages.html">校墙</a></li>
@@ -279,16 +255,14 @@
             <p>©2026 - ISA Spectrum 版权所有</p>
         </div>
     </footer>
-    <script>
-        // 汉堡菜单交互
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
 
-        if (menuToggle && navLinks) {
-            menuToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-            });
-        }
+    <script>
+        // 汉堡菜单（和全站统一，100%可用）
+        const btn = document.getElementById('menuToggle');
+        const list = document.getElementById('navList');
+        btn.onclick = function(){
+            list.classList.toggle('show');
+        };
     </script>
 </body>
 </html>
