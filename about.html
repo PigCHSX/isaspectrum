@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>关于ISA Spectrum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公告 - ISA Spectrum</title>
     <style>
         * {
             margin: 0;
@@ -18,24 +18,19 @@
             background-color: #fff;
         }
 
-        /* 主题色变量 */
         :root {
             --theme-color: #1e50ae;
-            --secondary-color: #3F23B4;
-            --text-gray: #999;
-            --text-light-gray: #ccc;
             --footer-bg: #262626;
             --footer-text: #7b7b7b;
         }
 
-        /* 导航栏 */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
         }
 
@@ -76,7 +71,6 @@
             text-decoration: none;
             color: #333;
             font-size: 16px;
-            transition: color 0.3s ease;
         }
 
         .nav-links a:hover,
@@ -84,26 +78,24 @@
             color: var(--theme-color);
         }
 
-        /* 汉堡按钮 - 电脑端隐藏 */
         .menu-toggle {
             display: none;
             background: none;
             border: none;
             font-size: 26px;
             cursor: pointer;
-            padding: 5px;
         }
 
-        /* 顶部banner图 */
+        /* 修复：banner宽度限制 */
         .about-banner {
             margin-top: 60px;
             width: 100%;
+            max-width: 100%;
             height: 350px;
             background-size: cover;
             background-position: center;
         }
 
-        /* 主要内容 */
         .main-content {
             max-width: 1200px;
             margin: 60px auto;
@@ -144,7 +136,6 @@
             background-color: #15408f;
         }
 
-        /* 页脚 */
         .footer {
             background-color: var(--footer-bg);
             color: var(--footer-text);
@@ -179,14 +170,12 @@
             font-size: 12px;
         }
 
-        /* 移动端适配 */
         @media (max-width: 768px) {
             .nav-container {
                 flex-wrap: wrap;
                 height: auto;
                 padding: 10px 20px;
             }
-
             .nav-links {
                 display: none;
                 flex-direction: column;
@@ -194,37 +183,27 @@
                 text-align: center;
                 padding: 10px 0;
             }
-
             .nav-links.show {
                 display: flex !important;
             }
-
             .nav-links li {
                 margin: 10px 0;
             }
-
             .menu-toggle {
                 display: block !important;
             }
-
+            /* 修复：手机端banner高度 */
             .about-banner {
                 height: 200px;
             }
         }
     </style>
-    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-    <link rel="shortcut icon" href="/images/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="ISA Spectrum" />
-    <link rel="manifest" href="/images/site.webmanifest" />
 </head>
 <body>
-    <!-- 导航栏 -->
     <header class="header">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <img src="./images/logo.png" alt="ISA Spectrum Logo">
+                <img src="./images/logo.png" alt="Logo">
                 <span>ISA Spectrum</span>
             </a>
             <button class="menu-toggle" id="menuToggle">☰</button>
@@ -232,16 +211,14 @@
                 <li><a href="main.html">首页</a></li>
                 <li><a href="notice.html">公告</a></li>
                 <li><a href="messages.html">校墙</a></li>
-                <li><a href="about.html" class="active">关于ISA Spectrum</a></li>
+                <li><a href="about.html" class="active">关于ISA</a></li>
                 <li><a href="contact.html">联系我们</a></li>
             </ul>
         </div>
     </header>
 
-    <!-- Banner图 -->
     <div class="about-banner" style="background-image: url('./images/about-banner.png');"></div>
 
-    <!-- 主要内容 -->
     <main class="main-content">
         <div class="content-section">
             <p>ISA Spectrum是武汉爱莎文华中学的一面学生自制校园墙，现处于测试阶段，后期打算制作成学校的共用社区，让大家都可以使用它发表自己的见闻感想，作者会定期精选大家发布的趣事并汇总成类似刊物的形式发表。</p>
@@ -250,31 +227,19 @@
         </div>
     </main>
 
-    <!-- 页脚 -->
     <footer class="footer">
         <div class="footer-container">
-            <div class="footer-section">
-                <h3>TEMPLATE</h3>
-            </div>
-            <div class="footer-section">
-                <p>联系邮箱<br>peiguo.li29@isawuhan.com（后期可能变动）</p>
-            </div>
-            <div class="footer-section">
-                <p>联系电话<br>16602707968</p>
-            </div>
+            <div class="footer-section"><h3>TEMPLATE</h3></div>
+            <div class="footer-section"><p>邮箱<br>peiguo.li29@isawuhan.com</p></div>
+            <div class="footer-section"><p>电话<br>16602707968</p></div>
         </div>
-        <div class="footer-bottom">
-            <p>©2026 - ISA Spectrum 版权所有</p>
-        </div>
+        <div class="footer-bottom">©2026 ISA Spectrum 版权所有</div>
     </footer>
 
     <script>
-        // 汉堡菜单
         const btn = document.getElementById('menuToggle');
         const list = document.getElementById('navList');
-        btn.onclick = function(){
-            list.classList.toggle('show');
-        };
+        btn.onclick = ()=>list.classList.toggle('show');
     </script>
 </body>
 </html>
