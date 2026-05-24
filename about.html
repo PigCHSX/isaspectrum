@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公告 - ISA Spectrum</title>
+    <title>关于ISA Spectrum</title>
     <style>
         * {
             margin: 0;
@@ -197,6 +197,38 @@
                 height: 200px;
             }
         }
+        /* 新增：全局图片响应式 + 防溢出 */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+            max-width: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* 优化 banner，确保无异常边距 */
+        .about-banner {
+            margin-top: 60px;
+            width: 100%;
+            max-width: 100%;
+            height: 350px;
+            background-size: cover;
+            background-position: center;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .about-banner {
+                height: 200px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -211,7 +243,7 @@
                 <li><a href="main.html">首页</a></li>
                 <li><a href="notice.html">公告</a></li>
                 <li><a href="messages.html">校墙</a></li>
-                <li><a href="about.html" class="active">关于ISA</a></li>
+                <li><a href="about.html" class="active">关于ISA Spectrum</a></li>
                 <li><a href="contact.html">联系我们</a></li>
             </ul>
         </div>
