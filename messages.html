@@ -349,68 +349,34 @@
             text-align: center;
             font-size: 12px;
         }
-        .menu-toggle {
-            display: none; /* 默认隐藏汉堡按钮 */
-        }
+
         @media (max-width: 768px) {
-    .nav-container {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 10px 20px;
-    }
-
-    .nav-links {
-        display: none; /* 默认隐藏，点击按钮后显示 */
-        flex-direction: column;
-        width: 100%;
-        text-align: center;
-    }
-
-    .nav-links.active {
-        display: flex; /* 点击按钮后显示 */
-    }
-
-    .nav-links li {
-        margin: 10px 0;
-    }
-
-    /* 汉堡菜单按钮样式 */
-    .menu-toggle {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #333;
-    }
-
-    .menu-toggle:focus {
-        outline: none;
-    }
-
-    .banner {
-        margin-top: 0; /* 取消顶部间距，紧贴导航栏 */
-        height: 60vw;
-    }
-
-    .main-content {
-        padding: 40px 20px;
-    }
-
-    .main-logo {
-        width: 150px;
-    }
-
-    .intro-text {
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .intro-text-en {
-        font-size: 11px;
-        line-height: 1.5;
-    }
-}
+            .nav-links {
+                display: none;
+            }
+            .page-title {
+                font-size: 24px;
+            }
+            .main-content {
+                margin: 40px auto;
+                padding: 0 15px;
+            }
+            .message-form-section,
+            .message-list-section {
+                padding: 20px;
+            }
+            .submit-btn {
+                width: 100%;
+            }
+            .message-image {
+                width: 100px;
+                height: 100px;
+            }
+            .file-preview {
+                width: 80px;
+                height: 80px;
+            }
+        }
     </style>
     <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
@@ -426,7 +392,6 @@
                 <img src="./images/logo.png" alt="ISA Spectrum Logo">
                 <span>ISA Spectrum</span>
             </a>
-            <button class="menu-toggle" id="menuToggle">☰</button>
             <ul class="nav-links">
                 <li><a href="main.html">首页</a></li>
                 <li><a href="notice.html">公告</a></li>
@@ -452,9 +417,9 @@
             </div>
             <!-- 多图上传按钮 -->
             <div class="form-group">
-                <label>上传图片（可选，电脑端支持多张，最多5张）</label>
+                <label>上传图片（可选，最多5张）</label>
                 <div class="file-upload" id="fileUploadContainer" onclick="document.getElementById('messagePicFile').click()">
-                    <span>点击选择多张图片（Mac按Command/Windows按Ctrl多选）</span>
+                    <span>点击选择多张图片（Mac按Command多选）</span>
                     <input type="file" id="messagePicFile" accept="image/*" multiple onchange="previewImages(this)">
                 </div>
                 <div class="preview-container" id="previewContainer"></div>
@@ -638,15 +603,6 @@
             const div = document.createElement('div');
             div.textContent = text || '';
             return div.innerHTML;
-        }
-        // 汉堡菜单交互
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
-
-        if (menuToggle && navLinks) {
-            menuToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-            });
         }
     </script>
 </body>
