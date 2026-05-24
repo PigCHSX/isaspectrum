@@ -84,7 +84,6 @@
             color: var(--theme-color);
         }
 
-        /* 汉堡按钮 */
         .menu-toggle {
             display: none;
             background: none;
@@ -94,9 +93,10 @@
             padding: 5px;
         }
 
+        /* 修复：增加顶部margin，避免被导航栏遮挡 */
         .main-content {
             max-width: 1200px;
-            margin: 60px auto;
+            margin: 80px auto 60px;
             padding: 0 20px;
         }
 
@@ -198,7 +198,6 @@
             margin-top: 15px;
         }
 
-        /* 多图上传样式 */
         .file-upload {
             padding: 15px;
             border: 1px dashed #ddd;
@@ -217,7 +216,6 @@
             display: none;
         }
 
-        /* 多图预览容器 */
         .preview-container {
             margin-top: 15px;
             display: flex;
@@ -249,7 +247,6 @@
             transition: width 0.3s ease;
         }
 
-        /* 留言列表 */
         .message-list-section {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -286,16 +283,14 @@
             color: var(--text-gray);
         }
 
-        /* 核心修改：把留言内容从居中改成居左 */
         .message-content {
             color: #555;
             line-height: 1.8;
             margin-bottom: 15px;
             white-space: pre-line;
-            text-align: left !important; /* 新增这行，强制居左 */
+            text-align: left !important;
         }
 
-        /* 留言多图展示 */
         .message-images {
             display: flex;
             gap: 10px;
@@ -360,14 +355,12 @@
             font-size: 12px;
         }
 
-        /* 移动端适配 + 汉堡菜单 */
         @media (max-width: 768px) {
             .nav-container {
                 flex-wrap: wrap;
                 height: auto;
                 padding: 10px 20px;
             }
-
             .nav-links {
                 display: none;
                 flex-direction: column;
@@ -375,24 +368,21 @@
                 text-align: center;
                 padding: 10px 0;
             }
-
             .nav-links.show {
                 display: flex !important;
             }
-
             .nav-links li {
                 margin: 10px 0;
             }
-
             .menu-toggle {
                 display: block !important;
             }
-
             .page-title {
                 font-size: 24px;
             }
+            /* 修复：手机端保持顶部安全距离 */
             .main-content {
-                margin: 40px auto;
+                margin: 80px auto 40px;
                 padding: 0 15px;
             }
             .message-form-section,
@@ -426,7 +416,6 @@
                 <img src="./images/logo.png" alt="ISA Spectrum Logo">
                 <span>ISA Spectrum</span>
             </a>
-            <!-- 新增汉堡按钮 -->
             <button class="menu-toggle" id="menuToggle">☰</button>
             <ul class="nav-links" id="navList">
                 <li><a href="main.html">首页</a></li>
@@ -451,7 +440,6 @@
                 <label for="messageContent">留言内容 <span style="color: red;">*</span></label>
                 <textarea id="messageContent" class="form-control" placeholder="分享你的校园趣事、心情、疑问..."></textarea>
             </div>
-            <!-- 多图上传按钮 -->
             <div class="form-group">
                 <label>上传图片（可选，最多5张）</label>
                 <div class="file-upload" id="fileUploadContainer" onclick="document.getElementById('messagePicFile').click()">
@@ -495,12 +483,11 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJiY25yc2t0cWFydmNlZWtyc3diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjUxODYsImV4cCI6MjA5NTEwMTE4Nn0.Mu6GW91z1HW2iX-tbQgH5qXrvpG2SPc9QoqCxGvV-54';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const STORAGE_BUCKET = 'message-pics';
-        const MAX_IMAGES = 5; // 最多上传5张图
-        const MAX_SIZE = 5 * 1024 * 1024; // 单张5MB
+        const MAX_IMAGES = 5;
+        const MAX_SIZE = 5 * 1024 * 1024;
 
         window.onload = loadMessages;
 
-        // 多图预览
         function previewImages(input) {
             const container = document.getElementById('previewContainer');
             container.innerHTML = '';
@@ -531,7 +518,6 @@
             });
         }
 
-        // 批量上传图片
         async function uploadImages(files) {
             if (!files || files.length === 0) return null;
             const urlList = [];
@@ -558,7 +544,6 @@
             }
         }
 
-        // 发布留言
         async function postMessage() {
             const username = document.getElementById('username').value.trim() || '匿名同学';
             const content = document.getElementById('messageContent').value.trim();
@@ -578,7 +563,6 @@
 
                 if (error) throw error;
                 alert('留言发布成功！');
-                // 清空表单
                 document.getElementById('username').value = '';
                 document.getElementById('messageContent').value = '';
                 document.getElementById('messagePicFile').value = '';
@@ -592,7 +576,6 @@
             }
         }
 
-        // 加载留言
         async function loadMessages() {
             const container = document.getElementById('messageContainer');
             container.innerHTML = '<div class="loading">加载留言中...</div>';
@@ -609,7 +592,6 @@
                 let html = '';
                 data.forEach(msg => {
                     const time = new Date(msg.created_at).toLocaleString('zh-CN');
-                    // 渲染多张图片
                     let imageHtml = '';
                     if (msg.pic_url && msg.pic_url.length > 0) {
                         imageHtml = '<div class="message-images">';
@@ -641,12 +623,9 @@
             return div.innerHTML;
         }
 
-        // ✅ 汉堡菜单JS（终于加上了！）
         const btn = document.getElementById('menuToggle');
         const list = document.getElementById('navList');
-        btn.onclick = function(){
-            list.classList.toggle('show');
-        };
+        btn.onclick = ()=>list.classList.toggle('show');
     </script>
 </body>
 </html>
