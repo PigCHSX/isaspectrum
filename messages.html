@@ -585,7 +585,7 @@
                         const checkerEmails = checkers.map(c => c.email).join(',');
                         await emailjs.send("service_9pshvlz", "template_new_pending", {
                             content: content,
-                            email: contactEmail,
+                            to: contactEmail,
                             to_email: checkerEmails
                         }, { publicKey: EMAILJS_PUBLIC_KEY_SUB });
                     }
