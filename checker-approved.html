@@ -149,7 +149,7 @@
                     action: '已删除',
                     reason: reason,
                     content: msg.content,
-                    email: msg.contact_email || ''
+                    to: msg.contact_email 
                 });
             } catch(e) { console.log('通知发布者失败:', e); }
 
@@ -158,7 +158,7 @@
                     action: '已删除',
                     reason: reason,
                     content: msg.content,
-                    email: msg.contact_email || '',
+                    to: msg.contact_email ,
                     checker_name: currentChecker.username,
                     checker_email: currentChecker.email
                 }, { publicKey: EMAILJS_PUBLIC_KEY_SUB });
