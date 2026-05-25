@@ -1,0 +1,670 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校墙 - ISA Spectrum</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <style>
+       * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: "微软雅黑", sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        :root {
+            --theme-color: #1e50ae;
+            --secondary-color: #3F23B4;
+            --text-gray: #999;
+            --text-light-gray: #ccc;
+            --footer-bg: #262626;
+            --footer-text: #7b7b7b;
+            --card-bg: #f9f9f9;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--theme-color);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--theme-color);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* 修复：增加顶部margin，避免被导航栏遮挡 */
+        .main-content {
+            max-width: 1200px;
+            margin: 80px auto 60px;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 32px;
+            color: var(--theme-color);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: var(--theme-color);
+            margin: 15px auto 0;
+        }
+
+        .message-form-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            font-size: 20px;
+            color: var(--theme-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--theme-color);
+            box-shadow: 0 0 0 2px rgba(30, 80, 174, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 200px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            background-color: var(--theme-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #15408f;
+        }
+
+        .submit-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .form-note {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 15px;
+        }
+
+        .file-upload {
+            padding: 15px;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            text-align: center;
+            color: #666;
+        }
+
+        .file-upload:hover {
+            border-color: var(--theme-color);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .upload-progress {
+            margin-top: 10px;
+            height: 6px;
+            background-color: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--theme-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .message-list-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .message-author {
+            font-weight: bold;
+            color: var(--theme-color);
+            font-size: 16px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .message-content {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            white-space: pre-line;
+            text-align: left !important;
+        }
+
+        .message-images {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .message-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-gray);
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-gray);
+            font-size: 16px;
+        }
+
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .footer-section h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p {
+            font-size: 13px;
+            line-height: 22px;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #2b2b2b;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px 20px;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                padding: 10px 0;
+            }
+            .nav-links.show {
+                display: flex !important;
+            }
+            .nav-links li {
+                margin: 10px 0;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+            .page-title {
+                font-size: 24px;
+            }
+            /* 修复：手机端保持顶部安全距离 */
+            .main-content {
+                margin: 80px auto 40px;
+                padding: 0 15px;
+            }
+            .message-form-section,
+            .message-list-section {
+                padding: 20px;
+            }
+            .submit-btn {
+                width: 100%;
+            }
+            .message-image {
+                width: 100px;
+                height: 100px;
+            }
+            .file-preview {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="ISA Spectrum" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <!-- 引入EmailJS核心库（必须放在所有emailjs逻辑之前） -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="./images/logo.png" alt="ISA Spectrum Logo">
+                <span>ISA Spectrum</span>
+            </a>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <ul class="nav-links" id="navList">
+                <li><a href="main.html">首页</a></li>
+                <li><a href="notice.html">公告</a></li>
+                <li><a href="messages.html" class="active">校墙</a></li>
+                <li><a href="about.html">关于ISA Spectrum</a></li>
+                <li><a href="contact.html">联系我们</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">校墙</h1>
+
+        <section class="message-form-section">
+            <h2 class="form-title">📝 发表你的留言</h2>
+            <div class="form-group">
+                <label for="username">你的昵称</label>
+                <input type="text" id="username" class="form-control" placeholder="请输入你的昵称（选填，默认匿名）">
+            </div>
+            <div class="form-group">
+                <label for="contactEmail">联系邮箱 <span style="color: red;">*</span></label>
+                <input type="email" id="contactEmail" class="form-control" placeholder="请输入你的邮箱（用于接收审核通知）" required>
+            </div>
+            <div class="form-group">
+                <label for="messageContent">留言内容 <span style="color: red;">*</span></label>
+                <textarea id="messageContent" class="form-control" placeholder="分享你的校园趣事、心情、疑问……"></textarea>
+            </div>
+            <div class="form-group">
+                <label>上传图片（可选）</label>
+                <div class="file-upload" id="fileUploadContainer" onclick="document.getElementById('messagePicFile').click()">
+                    <span>点击选择图片</span>
+                    <input type="file" id="messagePicFile" accept="image/*" multiple onchange="previewImages(this)">
+                </div>
+                <div class="preview-container" id="previewContainer"></div>
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="postMessage()" id="submitBtn">发布留言</button>
+            <p class="form-note">留言需经过审核后才会公开显示，请留意邮箱通知。</p>
+        </section>
+
+        <section class="message-list-section">
+            <h2 class="form-title">💬 大家的留言</h2>
+            <div id="messageContainer" class="loading">加载留言中...</div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>ISA SPECTRUM</h3>
+            </div>
+            <div class="footer-section">
+                <p>联系邮箱<br>peiguo.li29@isawuhan.com</p>
+            </div>
+            <div class="footer-section">
+                <p>联系电话<br>16602707968</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>©2026 - ISA Spectrum 版权所有</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://bbcnrsktqarvceekrswb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJiY25yc2t0cWFydmNlZWtyc3diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjUxODYsImV4cCI6MjA5NTEwMTE4Nn0.Mu6GW91z1HW2iX-tbQgH5qXrvpG2SPc9QoqCxGvV-54';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const STORAGE_BUCKET = 'message-pics';
+        const MAX_IMAGES = 5;
+        const MAX_SIZE = 5 * 1024 * 1024;
+
+        // EmailJS 配置
+        const EMAILJS_PUBLIC_KEY_MAIN = 'uahvFOAFb1xRmqK6F';
+        const EMAILJS_PUBLIC_KEY_SUB = 'pESVSeXQr0aep4iGL';
+
+        window.onload = function() {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_PUBLIC_KEY_MAIN);
+            } else {
+                console.error('EmailJS库未加载！请检查CDN引入是否正确');
+                alert('邮件通知功能异常：未加载EmailJS库，请联系管理员');
+            }
+            loadMessages();
+        };
+
+        function previewImages(input) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            const files = Array.from(input.files);
+
+            if (files.length > MAX_IMAGES) {
+                alert(`最多只能上传${MAX_IMAGES}张图片！`);
+                input.value = '';
+                return;
+            }
+
+            files.forEach((file, index) => {
+                if (!file.type.startsWith('image/') || file.size > MAX_SIZE) {
+                    alert(`第${index+1}张图片格式/大小不符合要求！`);
+                    input.value = '';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'file-preview';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function uploadImages(files) {
+            if (!files || files.length === 0) return null;
+            const urlList = [];
+            const progressBar = document.getElementById('progressBar');
+            const uploadProgress = document.getElementById('uploadProgress');
+            
+            uploadProgress.style.display = 'block';
+            progressBar.style.width = '0%';
+
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${files[i].name}`;
+                    await supabase.storage.from(STORAGE_BUCKET).upload(fileName, files[i]);
+                    const { data: urlData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+                    urlList.push(urlData.publicUrl);
+                    progressBar.style.width = `${((i+1)/files.length)*100}%`;
+                }
+                return urlList;
+            } catch (error) {
+                alert('图片上传失败：' + error.message);
+                return null;
+            } finally {
+                uploadProgress.style.display = 'none';
+            }
+        }
+
+        async function postMessage() {
+            const username = document.getElementById('username').value.trim() || '匿名同学';
+            const contactEmail = document.getElementById('contactEmail').value.trim();
+            const content = document.getElementById('messageContent').value.trim();
+            const files = document.getElementById('messagePicFile').files;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!contactEmail) { alert('请填写联系邮箱！'); return; }
+            if (!content) { alert('留言内容不能为空！'); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '发布中...';
+
+            try {
+                const picUrls = await uploadImages(Array.from(files));
+                const { error } = await supabase.from('messages').insert([{
+                    username, content, pic_url: picUrls, contact_email: contactEmail, flag: 0
+                }]);
+
+                if (error) throw error;
+
+                // 向所有审核员发送提醒邮件
+                try {
+                    const { data: checkers } = await supabase.from('checkers').select('email');
+                    if (checkers && checkers.length > 0) {
+                        const checkerEmails = checkers.map(c => c.email).join(',');
+                        await emailjs.send("service_9pshvlz", "template_new_pending", {
+                            content: content,
+                            to: contactEmail,
+                            to_email: checkerEmails
+                        }, { publicKey: EMAILJS_PUBLIC_KEY_SUB });
+                    }
+                } catch(e) { 
+                    console.log('审核员邮件通知失败（不影响发布）:', e);
+                    alert('审核员邮件通知失败（不影响发布）：' + e.message); // 新增提示
+                }
+
+                alert('留言发布成功！请留意邮箱查看审核结果。');
+                document.getElementById('username').value = '';
+                document.getElementById('contactEmail').value = '';
+                document.getElementById('messageContent').value = '';
+                document.getElementById('messagePicFile').value = '';
+                document.getElementById('previewContainer').innerHTML = '';
+                loadMessages();
+            } catch (error) {
+                alert('发布失败：' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '发布留言';
+            }
+        }
+
+        async function loadMessages() {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = '<div class="loading">加载留言中...</div>';
+
+            try {
+                const { data, error } = await supabase.from('messages').select('*').eq('flag', 1).order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data.length) {
+                    container.innerHTML = '<div class="empty-message">暂无留言，快来发布第一条留言吧！</div>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(msg => {
+                    const time = new Date(msg.created_at).toLocaleString('zh-CN');
+                    let imageHtml = '';
+                    if (msg.pic_url && msg.pic_url.length > 0) {
+                        imageHtml = '<div class="message-images">';
+                        msg.pic_url.forEach(url => {
+                            imageHtml += `<img src="${escapeHtml(url)}" class="message-image" onclick="window.open(this.src)">`;
+                        });
+                        imageHtml += '</div>';
+                    }
+
+                    html += `
+                    <div class="message-item">
+                        <div class="message-header">
+                            <span class="message-author">${escapeHtml(msg.username)}</span>
+                            <span class="message-time">${time}</span>
+                        </div>
+                        <div class="message-content">${escapeHtml(msg.content).replace(/\n/g, '<br>')}</div>
+                        ${imageHtml}
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<div class="empty-message">加载失败：${error.message}</div>`;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        const btn = document.getElementById('menuToggle');
+        const list = document.getElementById('navList');
+        btn.onclick = function() { list.classList.toggle('show'); };
+    </script>
+</body>
+</html>
