@@ -532,31 +532,46 @@
         }
 
         // 上传图片到 Supabase Storage（无修改）
-        async function uploadImages(files) {
-            if (!files || files.length === 0) return null;
-            const urlList = [];
-            const progressBar = document.getElementById('progressBar');
-            const uploadProgress = document.getElementById('uploadProgress');
-            
-            uploadProgress.style.display = 'block';
-            progressBar.style.width = '0%';
+async function uploadImages(files) {
+    if (!files || files.length === 0) return null;
+    const urlList = [];
+    const progressBar = document.getElementById('progressBar');
+    const uploadProgress = document.getElementById('uploadProgress');
+    
+    uploadProgress.style.display = 'block';
+    progressBar.style.width = '0%';
 
-            try {
-                for (let i = 0; i < files.length; i++) {
-                    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${files[i].name}`;
-                    await supabase.storage.from(STORAGE_BUCKET).upload(fileName, files[i]);
-                    const { data: urlData } = await supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-                    urlList.push(urlData.publicUrl);
-                    progressBar.style.width = `${((i+1)/files.length)*100}%`;
-                }
-                return urlList;
-            } catch (error) {
-                alert('图片上传失败：' + error.message);
-                return null;
-            } finally {
-                uploadProgress.style.display = 'none';
+    try {
+        for (let i = 0; i < files.length; i++) {
+            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${files[i].name}`;
+            
+            // ✅ 关键：拿到 upload 返回的 error
+            const { error } = await supabase.storage
+                .from(STORAGE_BUCKET)
+                .upload(fileName, files[i]);
+            
+            // ✅ 如果有错误，立即抛出（会被 catch 捕获）
+            if (error) {
+                console.error('上传详细错误：', error);
+                throw new Error(`图片上传失败: ${error.message}`);
             }
+            
+            // 上传成功，获取公开 URL
+            const { data: urlData } = supabase.storage
+                .from(STORAGE_BUCKET)
+                .getPublicUrl(fileName);
+            urlList.push(urlData.publicUrl);
+            
+            progressBar.style.width = `${((i+1)/files.length)*100}%`;
         }
+        return urlList;
+    } catch (error) {
+        alert(error.message);
+        return null;   // 上传失败，返回 null
+    } finally {
+        uploadProgress.style.display = 'none';
+    }
+}
 
         // 发布留言（核心修复）
         async function postMessage() {
@@ -575,6 +590,11 @@
             try {
                 // 1. 上传图片
                 const picUrls = await uploadImages(Array.from(files));
+                if (files.length > 0 && picUrls === null) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '发布留言';
+                    return;  // 上传失败，不再继续提交数据库
+                }
                 
                 // 2. 插入数据库
                 const { error } = await supabase.from('messages').insert([{
