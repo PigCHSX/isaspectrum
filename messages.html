@@ -257,6 +257,8 @@
             padding: 20px;
             border-bottom: 1px solid #eee;
             margin-bottom: 15px;
+            scroll-margin-top: 80px;
+            text-align: left !important;
         }
 
         .message-item:last-child {
@@ -303,6 +305,67 @@
             object-fit: cover;
             border-radius: 8px;
             cursor: pointer;
+        }
+
+        .reply-info {
+            font-size: 13px;
+            color: #0c5460;
+            background: #e9f7fe;
+            padding: 6px 12px;
+            border-radius: 16px;
+            display: inline-block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            float: none !important;
+        }
+        .reply-info:hover {
+            background: #d1ecf1;
+            text-decoration: underline;
+        }
+
+        .reply-btn {
+            background: none;
+            border: none;
+            color: var(--theme-color);
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            transition: background 0.2s;
+            display: inline-block;
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            float: none !important;
+        }
+        .reply-btn:hover {
+            background: #e9ecef;
+        }
+
+        .reply-tip {
+            background: #e9f7fe;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #0c5460;
+            text-align: left;
+        }
+
+        .cancel-reply {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 14px;
         }
 
         .empty-message {
@@ -406,7 +469,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="ISA Spectrum" />
     <link rel="manifest" href="/images/site.webmanifest" />
-    <!-- 修复：用v4版本EmailJS（兼容最新API） -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
@@ -432,6 +494,8 @@
 
         <section class="message-form-section">
             <h2 class="form-title">📝 发表你的留言</h2>
+            <input type="hidden" id="replyToId" value="">
+            <div id="replyTipContainer"></div>
             <div class="form-group">
                 <label for="username">你的昵称</label>
                 <input type="text" id="username" class="form-control" placeholder="请输入你的昵称（选填，默认匿名）">
@@ -490,29 +554,42 @@
         const MAX_IMAGES = 5;
         const MAX_SIZE = 5 * 1024 * 1024;
 
-        // ========== 替换成你自己的EmailJS配置（必须改！） ==========
-        const EMAILJS_PUBLIC_KEY = 'pESVSeXQr0aep4iGL'; 
-        const EMAILJS_SERVICE_ID = 'service_9pshvlz'; 
-        const EMAILJS_TEMPLATE_ID = 'template_new_pending'; 
-
-        window.onload = function() {
-            // 修复1：初始化EmailJS（v4版本正确写法）
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-            loadMessages();
+        // 确认无误的配置
+        const AUDIT_CONFIG = {
+            publicKey: 'pESVSeXQr0aep4iGL',
+            serviceId: 'service_9pshvlz',
+            templateId: 'template_new_pending'
         };
 
-        // 图片预览（无修改）
+        const REPLY_CONFIG = {
+            publicKey: 'llBCrDfznsE4il9lF',
+            serviceId: 'service_vi16f3b',
+            templateId: 'reply_remind'
+        };
+
+        console.log('=== 系统初始化 ===');
+        console.log('审核账号配置:', AUDIT_CONFIG);
+        console.log('回复账号配置:', REPLY_CONFIG);
+
+        let userMap = {};
+
+        window.onload = function() {
+            emailjs.init(AUDIT_CONFIG.publicKey);
+            console.log('全局初始化审核账号完成');
+            loadMessages();
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const element = document.querySelector(window.location.hash);
+                    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+            }
+        };
+
         function previewImages(input) {
             const container = document.getElementById('previewContainer');
             container.innerHTML = '';
             const files = Array.from(input.files);
-
-            if (files.length > MAX_IMAGES) {
-                alert(`最多只能上传${MAX_IMAGES}张图片！`);
-                input.value = '';
-                return;
-            }
-
+            if (files.length > MAX_IMAGES) { alert(`最多只能上传${MAX_IMAGES}张图片！`); input.value = ''; return; }
             for (let file of files) {
                 if (!file.type.startsWith('image/') || file.size > MAX_SIZE) {
                     alert(`图片格式/大小不符合要求！`);
@@ -531,54 +608,94 @@
             }
         }
 
-        // 上传图片到 Supabase Storage（无修改）
-async function uploadImages(files) {
-    if (!files || files.length === 0) return null;
-    const urlList = [];
-    const progressBar = document.getElementById('progressBar');
-    const uploadProgress = document.getElementById('uploadProgress');
-    
-    uploadProgress.style.display = 'block';
-    progressBar.style.width = '0%';
-
-    try {
-        for (let i = 0; i < files.length; i++) {
-            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${files[i].name}`;
-            
-            // ✅ 关键：拿到 upload 返回的 error
-            const { error } = await supabase.storage
-                .from(STORAGE_BUCKET)
-                .upload(fileName, files[i]);
-            
-            // ✅ 如果有错误，立即抛出（会被 catch 捕获）
-            if (error) {
-                console.error('上传详细错误：', error);
-                throw new Error(`图片上传失败: ${error.message}`);
+        async function uploadImages(files) {
+            if (!files || files.length === 0) return null;
+            const urlList = [];
+            const progressBar = document.getElementById('progressBar');
+            const uploadProgress = document.getElementById('uploadProgress');
+            uploadProgress.style.display = 'block';
+            progressBar.style.width = '0%';
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${files[i].name}`;
+                    const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(fileName, files[i]);
+                    if (error) throw new Error(`图片上传失败: ${error.message}`);
+                    const { data: urlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+                    urlList.push(urlData.publicUrl);
+                    progressBar.style.width = `${((i+1)/files.length)*100}%`;
+                }
+                return urlList;
+            } catch (error) {
+                alert(error.message);
+                return null;
+            } finally {
+                uploadProgress.style.display = 'none';
             }
-            
-            // 上传成功，获取公开 URL
-            const { data: urlData } = supabase.storage
-                .from(STORAGE_BUCKET)
-                .getPublicUrl(fileName);
-            urlList.push(urlData.publicUrl);
-            
-            progressBar.style.width = `${((i+1)/files.length)*100}%`;
         }
-        return urlList;
-    } catch (error) {
-        alert(error.message);
-        return null;   // 上传失败，返回 null
-    } finally {
-        uploadProgress.style.display = 'none';
-    }
-}
 
-        // 发布留言（核心修复）
+        async function sendAuditEmail(userEmail, messageContent) {
+            try {
+                console.log('=== 发送审核邮件 ===');
+                const { data: checkers } = await supabase.from('checkers').select('email');
+                if (!checkers || checkers.length === 0) return;
+                const checkerEmails = checkers.map(c => c.email).join(',');
+                console.log('收件人:', checkerEmails);
+                console.log('模板参数:', { to_email: checkerEmails, to: userEmail, content: messageContent });
+                
+                const result = await emailjs.send(
+                    AUDIT_CONFIG.serviceId,
+                    AUDIT_CONFIG.templateId,
+                    { to_email: checkerEmails, to: userEmail, content: messageContent }
+                );
+                console.log('审核邮件发送成功:', result);
+            } catch (error) {
+                console.error('审核邮件失败:', error);
+                alert(`邮件通知失败（不影响发布）：${error.text || error.message}`);
+            }
+        }
+
+        async function sendReplyNotification(originalEmail, originalName, replyAuthor, replyContent, replyToId) {
+            try {
+                console.log('=== 发送回复通知 ===');
+                const replyLink = `${window.location.origin}${window.location.pathname}#message-${replyToId}`;
+                const templateParams = {
+                    to_email: originalEmail,
+                    to_name: originalName,
+                    reply_author: replyAuthor,
+                    reply_content: replyContent,
+                    reply_link: replyLink
+                };
+                console.log('收件人:', originalEmail);
+                console.log('模板参数:', templateParams);
+                
+                // 强制重新初始化回复账号
+                console.log('切换到回复账号:', REPLY_CONFIG.publicKey);
+                emailjs.init(REPLY_CONFIG.publicKey);
+                
+                const result = await emailjs.send(
+                    REPLY_CONFIG.serviceId,
+                    REPLY_CONFIG.templateId,
+                    templateParams
+                );
+                console.log('回复通知发送成功:', result);
+                return result;
+            } catch (error) {
+                console.error('回复通知失败 - 详细错误:', error);
+                if (error.text) console.error('错误详情:', error.text);
+                throw error;
+            } finally {
+                // 强制切回审核账号
+                console.log('切回审核账号:', AUDIT_CONFIG.publicKey);
+                emailjs.init(AUDIT_CONFIG.publicKey);
+            }
+        }
+
         async function postMessage() {
             const username = document.getElementById('username').value.trim() || '匿名同学';
             const contactEmail = document.getElementById('contactEmail').value.trim();
             const content = document.getElementById('messageContent').value.trim();
             const files = document.getElementById('messagePicFile').files;
+            const replyToId = document.getElementById('replyToId').value;
             const submitBtn = document.getElementById('submitBtn');
 
             if (!contactEmail) { alert('请填写联系邮箱！'); return; }
@@ -588,32 +705,47 @@ async function uploadImages(files) {
             submitBtn.textContent = '发布中...';
 
             try {
-                // 1. 上传图片
                 const picUrls = await uploadImages(Array.from(files));
                 if (files.length > 0 && picUrls === null) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = '发布留言';
-                    return;  // 上传失败，不再继续提交数据库
+                    return;
                 }
-                
-                // 2. 插入数据库
-                const { error } = await supabase.from('messages').insert([{
-                    username, content, pic_url: picUrls, contact_email: contactEmail, flag: 0
-                }]);
+                const insertData = {
+                    username, content, pic_url: picUrls, contact_email: contactEmail, flag: 0,
+                    reply_to: replyToId || null
+                };
+                const { error, data: newMsg } = await supabase.from('messages').insert([insertData]).select();
                 if (error) throw error;
+                console.log('留言发布成功:', newMsg);
 
-                // 3. 发送审核通知邮件（终极修复）
+                if (replyToId) {
+                    console.log('检测到回复留言，准备发送通知');
+                    const { data: original, error: fetchErr } = await supabase
+                        .from('messages')
+                        .select('contact_email, username')
+                        .eq('id', replyToId)
+                        .single();
+                    if (!fetchErr && original && original.contact_email) {
+                        console.log('找到原留言作者:', original);
+                        await sendReplyNotification(original.contact_email, original.username, username, content, replyToId);
+                    } else {
+                        console.warn('未找到原留言作者或邮箱为空');
+                    }
+                }
+
                 await sendAuditEmail(contactEmail, content);
-
                 alert('留言发布成功！如果审核未通过相关信息会发送到您的邮箱。');
-                // 清空表单
                 document.getElementById('username').value = '';
                 document.getElementById('contactEmail').value = '';
                 document.getElementById('messageContent').value = '';
                 document.getElementById('messagePicFile').value = '';
                 document.getElementById('previewContainer').innerHTML = '';
+                document.getElementById('replyToId').value = '';
+                document.getElementById('replyTipContainer').innerHTML = '';
                 loadMessages();
             } catch (error) {
+                console.error('发布失败:', error);
                 alert('发布失败：' + (error.message || error));
             } finally {
                 submitBtn.disabled = false;
@@ -621,58 +753,49 @@ async function uploadImages(files) {
             }
         }
 
-        // 独立的邮件发送函数（修复所有问题）
-        async function sendAuditEmail(userEmail, messageContent) {
-            try {
-                // 获取审核员邮箱
-                const { data: checkers } = await supabase.from('checkers').select('email');
-                if (!checkers || checkers.length === 0) {
-                    console.warn('无审核员邮箱配置');
-                    return;
-                }
-                const checkerEmails = checkers.map(c => c.email).join(',');
+        function setReplyTo(id, authorName) {
+            document.getElementById('replyToId').value = id;
+            const container = document.getElementById('replyTipContainer');
+            container.innerHTML = `
+                <div class="reply-tip">
+                    <span>💬 正在回复 @${escapeHtml(authorName)} 的留言</span>
+                    <button class="cancel-reply" onclick="cancelReply()">取消回复</button>
+                </div>
+            `;
+            document.querySelector('.message-form-section').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('messageContent').focus();
+        }
 
-                // 修复2：v4版本EmailJS调用格式 + 完整参数
-                const response = await emailjs.send(
-                    EMAILJS_SERVICE_ID,
-                    EMAILJS_TEMPLATE_ID,
-                    {
-                        // 这里的key必须和你EmailJS模板里的变量名完全一致！
-                        to_email: checkerEmails, // 审核员邮箱
-                        to: userEmail,   // 留言者邮箱
-                        content: messageContent, // 留言内容
-                    }
-                );
+        function cancelReply() {
+            document.getElementById('replyToId').value = '';
+            document.getElementById('replyTipContainer').innerHTML = '';
+        }
 
-                console.log('邮件发送成功:', response);
-            } catch (error) {
-                // 修复3：完整的错误捕获（打印所有信息）
-                console.error('邮件发送失败详情:', {
-                    code: error.code,
-                    text: error.text,
-                    message: error.message,
-                    original: error
-                });
-                // 修复undefined问题：优先取具体错误信息
-                const errorMsg = error.text || error.message || `邮件发送失败（错误码：${error.code || '未知'}）`;
-                alert(`邮件通知失败（不影响发布）：${errorMsg}\n请检查：\n1.EmailJS配置是否正确\n2.域名是否加入白名单\n3.模板变量是否匹配`);
+        function jumpToOriginal(replyToId) {
+            const target = document.getElementById(`message-${replyToId}`);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.style.transition = 'background 0.3s';
+                target.style.backgroundColor = '#f0f7ff';
+                setTimeout(() => { target.style.backgroundColor = ''; }, 1500);
+            } else {
+                alert('原留言不存在或未加载');
             }
         }
 
-        // 加载已通过的留言（无修改）
         async function loadMessages() {
             const container = document.getElementById('messageContainer');
             container.innerHTML = '<div class="loading">加载留言中...</div>';
-
             try {
                 const { data, error } = await supabase.from('messages').select('*').eq('flag', 1).order('created_at', { ascending: false });
                 if (error) throw error;
-
                 if (!data.length) {
                     container.innerHTML = '<div class="empty-message">暂无留言，快来发布第一条留言吧！</div>';
+                    userMap = {};
                     return;
                 }
-
+                userMap = {};
+                data.forEach(msg => { userMap[msg.id] = msg.username; });
                 let html = '';
                 for (let msg of data) {
                     const time = new Date(msg.created_at).toLocaleString('zh-CN');
@@ -684,31 +807,42 @@ async function uploadImages(files) {
                         }
                         imageHtml += '</div>';
                     }
+                    let replyInfoHtml = '';
+                    if (msg.reply_to && userMap[msg.reply_to]) {
+                        replyInfoHtml = `<div class="reply-info" onclick="jumpToOriginal('${msg.reply_to}')">↳ 回复 @${escapeHtml(userMap[msg.reply_to])}</div>`;
+                    }
                     html += `
-                    <div class="message-item">
+                    <div class="message-item" id="message-${msg.id}">
                         <div class="message-header">
                             <span class="message-author">${escapeHtml(msg.username)}</span>
                             <span class="message-time">${time}</span>
                         </div>
+                        ${replyInfoHtml}
                         <div class="message-content">${escapeHtml(msg.content).replace(/\n/g, '<br>')}</div>
                         ${imageHtml}
+                        <button class="reply-btn" onclick="setReplyTo('${msg.id}', '${escapeHtml(msg.username)}')">💬 回复</button>
                     </div>`;
                 }
                 container.innerHTML = html;
+                if (window.location.hash) {
+                    const targetId = window.location.hash;
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        setTimeout(() => targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+                    }
+                }
             } catch (error) {
                 console.error('加载留言失败:', error);
                 container.innerHTML = `<div class="empty-message">加载失败：${error.message}</div>`;
             }
         }
 
-        // HTML转义（无修改）
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text || '';
             return div.innerHTML;
         }
 
-        // 手机菜单（无修改）
         const btn = document.getElementById('menuToggle');
         const list = document.getElementById('navList');
         if (btn) btn.onclick = function() { list.classList.toggle('show'); };
