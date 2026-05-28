@@ -43,13 +43,6 @@
         const SUPABASE_URL = 'https://bbcnrsktqarvceekrswb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_f3Kav8ipJco_f9tw5zO50A_w7KigE5D';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function checkLoginStatus() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) location.href = 'messages.html';
-        }
-        window.onload = checkLoginStatus;
-
         async function doLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
