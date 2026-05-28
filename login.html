@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - ISA Spectrum</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: #f0f2f5; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .login-box { background: #fff; padding: 40px 30px; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); width: 100%; max-width: 400px; }
+        .login-box h2 { text-align: center; margin-bottom: 8px; color: #1e50ae; font-size: 24px; }
+        .login-box .sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 30px; }
+        .login-box input { width: 100%; padding: 14px 16px; margin-bottom: 16px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; transition: border-color 0.2s; }
+        .login-box input:focus { outline: none; border-color: #1e50ae; }
+        .login-btn { width: 100%; padding: 14px; background: #1e50ae; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .login-btn:hover { background: #15408f; }
+        .login-btn:disabled { background: #999; cursor: not-allowed; }
+        .back-link { display: block; text-align: center; margin-top: 10px; color: #1e50ae; text-decoration: none; font-size: 14px; }
+        .error-msg { color: #dc3545; text-align: center; font-size: 13px; margin-top: 8px; display: none; }
+    </style>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="ISA Spectrum" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+</head>
+<body>
+    <div class="login-box">
+        <h2>登录</h2>
+        <p class="sub">欢迎登录 ISA Spectrum 账号</p>
+        <input id="email" type="email" placeholder="邮箱">
+        <input id="password" type="password" placeholder="密码">
+        <button class="login-btn" id="loginBtn">登录</button>
+        <p class="error-msg" id="errorMsg"></p>
+        <a href="forgot-password.html" class="back-link">找回密码</a>
+        <a href="register.html" class="back-link">注册账号</a>
+        <a href="main.html" class="back-link">返回首页</a>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://bbcnrsktqarvceekrswb.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_f3Kav8ipJco_f9tw5zO50A_w7KigE5D';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkLoginStatus() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) location.href = 'messages.html';
+        }
+        window.onload = checkLoginStatus;
+
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            errorMsg.style.display = 'none';
+
+            if (!email || !password) {
+                errorMsg.textContent = '请填写邮箱和密码';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '登录中...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                
+                const username = data.user.user_metadata.username || data.user.email.split('@')[0];
+                localStorage.setItem('sb_username', username);
+                alert('登录成功！');
+                location.href = 'messages.html';
+            } catch (err) {
+                let errorText = '';
+                if (err.message.includes('Invalid login credentials')) errorText = '邮箱或密码错误';
+                else if (err.message.includes('Email not confirmed')) errorText = '邮箱未验证，请先激活';
+                else errorText = err.message;
+                
+                errorMsg.textContent = '登录失败：' + errorText;
+                errorMsg.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '登录';
+            }
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', doLogin);
+        document.addEventListener('keydown', e => e.key === 'Enter' && doLogin());
+    </script>
+</body>
+</html>
