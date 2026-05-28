@@ -644,6 +644,14 @@
                     if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 500);
             }
+            const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            alert('已退出登录');
+            location.href = 'login.html';
+        });
+    }
         };
 
         // 图片预览（保持不变）
