@@ -591,7 +591,7 @@
             // 获取用户详情
             const { data: { user }, error } = await supabase.auth.getUser();
             if (error || !user) {
-                alert('获取用户信息失败，请重新登录');
+                alert('登录超时，请重新登录');
                 await supabase.auth.signOut();
                 location.href = 'login.html';
                 return false;
