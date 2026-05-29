@@ -492,7 +492,7 @@
     <main class="main-content">
         <h1 class="page-title">Anonymous</h1>
 
-        <h1>Upgrading, service temporarily suspended</h1>
+        <h1>Upgrading, Service Suspended</h1>
 
         <section class="message-list-section">
             <h2 class="form-title">💬 Everyone's messages</h2>
@@ -753,7 +753,7 @@
                 const { data, error } = await supabase.from('messages').select('*').eq('flag', 1).order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data.length) {
-                    container.innerHTML = '<div class="empty-message">No messages yet, come and post the first one!</div>';
+                    container.innerHTML = '<div class="empty-message">Service Suspended</div>';
                     userMap = {};
                     return;
                 }
